@@ -3,6 +3,7 @@ jobs:
   build:
     docker:
       - image: debian:stretch
+    working_directory: ~/test-circleci
     steps:
       - checkout
       - run:
@@ -14,11 +15,20 @@ jobs:
       - run:
           name: Tar everything up
           command: tar -cvf everything.tar *
+      - store_artifacts:
+          path: ~/test-circlesi/everything.tar
+          destination: everything.tar
+      - persist_to_workspace:
+          root: ~/test-circleci
+          paths:
+            - *
   deploy:
     docker:
       - image: circleci/python:2.7-jessie
     working_directory: ~/test-circleci
     steps:
+      - attach_workspace:
+          at: ~/test-circleci
       - run:
           name: Install awscli
           command: sudo pip install awscli
