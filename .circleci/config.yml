@@ -21,7 +21,7 @@ jobs:
       - persist_to_workspace:
           root: ~/test-circleci
           paths:
-            - *
+            - everything.tar
   deploy:
     docker:
       - image: circleci/python:2.7-jessie
