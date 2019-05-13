@@ -1,0 +1,47 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: debian:stretch
+    steps:
+      - checkout
+      - run:
+          name: Greeting
+          command: echo Hello, world.
+      - run:
+          name: Print the Current Time
+          command: date
+      - run:
+          name: Tar everything up
+          command: tar -cvf everything.tar *
+  deploy:
+    docker:
+      - image: circleci/python:2.7-jessie
+    working_directory: ~/test-circleci
+    steps:
+      - run:
+          name: Install awscli
+          command: sudo pip install awscli
+      - run:
+          name: Deploy to S3
+#          command: aws s3 sync jekyll/_site/docs s3://circle-production-static-site/docs/ --delete
+          command: echo "I'm totally deploying to AWS rn"
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - hold:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
